@@ -1,0 +1,6 @@
+platform :ios, '7.0'
+pod 'AFNetworking', '~> 2.0'
+pod 'MBProgressHUD', '~> 0.8'
+pod 'MagicalRecord', '~> 2.2'
+pod 'CocoaLumberjack', '~> 1.6.3'
+pod 'MMDrawerController', '~> 0.5.1'
