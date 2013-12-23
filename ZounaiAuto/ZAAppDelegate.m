@@ -7,12 +7,68 @@
 //
 
 #import "ZAAppDelegate.h"
+#import "MMDrawerController.h"
+#import "MMDrawerVisualState.h"
+#import "ZADrawerViewController.h"
+#import "ZAViewController.h"
+#import "CoreData+MagicalRecord.h"
+#import "ZAPersistenceCenter.h"
+
+@interface ZAAppDelegate()
+
+@property (nonatomic, strong) MMDrawerController * drawerController;
+
+@end
 
 @implementation ZAAppDelegate
+- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    UIStoryboard* tmmStoryBoard = [UIStoryboard storyboardWithName:@"drawer" bundle:nil];
+    ZADrawerViewController *leftSideDrawerViewController = [tmmStoryBoard instantiateViewControllerWithIdentifier:@"leftDrawer"];
+//    UIViewController * leftSideDrawerViewController = [[ZADrawerViewController alloc] init];
+    
+    UIViewController * centerViewController = [[ZAViewController alloc] init];
+    
+    UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:centerViewController];
+    [navigationController setRestorationIdentifier:@"MMExampleCenterNavigationControllerRestorationKey"];
+    
+    self.drawerController = [[MMDrawerController alloc]
+                             initWithCenterViewController:navigationController
+                             leftDrawerViewController:leftSideDrawerViewController
+                             rightDrawerViewController:nil];
+    [self.drawerController setShowsShadow:NO];
+    [self.drawerController setRestorationIdentifier:@"MMDrawer"];
+    [self.drawerController setMaximumRightDrawerWidth:200.0];
+    [self.drawerController setOpenDrawerGestureModeMask:MMOpenDrawerGestureModePanningNavigationBar];
+    [self.drawerController setCloseDrawerGestureModeMask:MMCloseDrawerGestureModeAll];
+    [self.drawerController setDrawerVisualStateBlock:[MMDrawerVisualState swingingDoorVisualStateBlock]];
+    //    [self.drawerController
+    //     setDrawerVisualStateBlock:^(MMDrawerController *drawerController, MMDrawerSide drawerSide, CGFloat percentVisible) {
+    //         MMDrawerControllerDrawerVisualStateBlock block;
+    //         block = [[MMExampleDrawerVisualStateManager sharedManager]
+    //                  drawerVisualStateBlockForDrawerSide:drawerSide];
+    //         if(block){
+    //             block(drawerController, drawerSide, percentVisible);
+    //         }
+    //     }];
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    UIColor * tintColor = [UIColor colorWithRed:29.0/255.0
+                                          green:173.0/255.0
+                                           blue:234.0/255.0
+                                          alpha:1.0];
+    [self.window setTintColor:tintColor];
+    [self.window setRootViewController:self.drawerController];
+    
+    return YES;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [MagicalRecord setDefaultModelNamed:@"ZAModel.momd"];
+    [MagicalRecord setupCoreDataStackWithAutoMigratingSqliteStoreNamed:@"ZAModel.sqlite"];
+    [[ZAPersistenceCenter sharedInstance] saveStation];
+    [[ZAPersistenceCenter sharedInstance] saveSquad];
     return YES;
 }
 							
